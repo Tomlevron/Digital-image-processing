@@ -11,8 +11,13 @@ from scipy.signal import convolve2d as conv2
 from numpy.fft import fft2, ifft2, ifftshift
 from skimage import restoration
 
+
 img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
+def add_noise(img, dB):
+    
+    lin_SNR = 10.0 ** (dB/10.0)
+    
 def padwithzeros(vector, pad_width, iaxis, kwargs):
     vector[:pad_width[0]] = 0
     vector[-pad_width[1]:] = 0
@@ -95,13 +100,10 @@ def blur_image(img, kernel):
 # Create the kernals
 kernel_v = create_kernal(10)
 kernel_h = create_kernal(10, mode='horz') 
-kernel_both = create_kernal(11,mode='both')
 
 # convolution of the image with the kernal
 # vertical_mb = conv2(img, kernel_v, mode='same') 
 # horizontal_mb = conv2(img, kernel_h, mode='same') 
-# both = conv2(img, kernel_v, mode='same')
-
 
 size = 10
 kernel = np.zeros((size, size))
