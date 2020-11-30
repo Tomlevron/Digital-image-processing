@@ -10,14 +10,52 @@ from matplotlib import pyplot as plt
 from scipy.signal import convolve2d as conv2
 from numpy.fft import fft2, ifft2, ifftshift
 from skimage import restoration
-
+from scipy import ndimage
+from numpy import sum,sqrt
+from numpy.random import standard_normal
 
 img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
 def add_noise(img, dB):
-    
+    img = img.astype('uint8')
+    img_var = ndimage.variance(img)
     lin_SNR = 10.0 ** (dB/10.0)
+    # dB 10 * np.log10(img_var/noise_var)
+    noise_var = img_var / lin_SNR #62.5 is needed
+    print(noise_var)
+    row,col = img.shape
+    mean = 0.0
+    var = noise_var
+    sigma = var**0.5
+    print(sigma)
+    gauss = np.random.normal(mean,sigma,(row,col))#.astype('uint8')
+    gauss = gauss.reshape(row,col)
+    noisy = img + gauss
+    return noisy.astype('uint8')
+
     
+img_noisy = add_noise(img_blur,20)
+print(10 * np.log10(ndimage.variance(img)/ndimage.variance(img_noisy)))
+ 
+def awgn(s,SNRdB,L=1):
+    """
+    AWGN channel
+    Add AWGN noise to input signal. The function adds AWGN noise vector to signal 's' to generate a resulting signal vector 'r' of specified SNR in dB. It also
+    returns the noise vector 'n' that is added to the signal 's' and the power spectral density N0 of noise added
+    Parameters:
+        s : input/transmitted signal vector
+        SNRdB : desired signal to noise ratio (expressed in dB) for the received signal
+        L : oversampling factor (applicable for waveform simulation) default L = 1.
+    Returns:
+        r : received signal vector (r=s+n)
+"""
+    gamma = 10**(SNRdB/10) #SNR to linear scale
+    P=L*sum(sum(abs(s.astype('uint8'))**2))/len(s) # if s is a matrix [MxN]
+    N0=P/gamma # Find the noise spectral density
+    n = sqrt(N0/2)*standard_normal(s.shape) # computed noise
+    r = s + n # received signal
+    return r.astype('uint8')
+
 def padwithzeros(vector, pad_width, iaxis, kwargs):
     vector[:pad_width[0]] = 0
     vector[-pad_width[1]:] = 0
