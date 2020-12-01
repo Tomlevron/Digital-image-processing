@@ -14,8 +14,8 @@ from skimage import restoration
 from scipy import ndimage
 from numpy import sum,sqrt
 from numpy.random import standard_normal
-
-img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
+from skimage.util import random_noise 
+img = cv.imread('cameraman.tif', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
 def blur_image(img, kernel):
     '''
@@ -53,11 +53,12 @@ def inverse_filter(img,im_blur,kernel):
     convolved = freq_blur * freq_kernel
     restored = ifft2(convolved).real
     restored = 255 * restored / np.max(restored)
-    return restored #.astype('uint8')
+    return restored.astype('uint8')
 
 def add_noise(img, dB):
-    img = img#.astype('uint8')
+    img = img.astype('uint8')
     img_var = ndimage.variance(img)
+    img_mean = ndimage.mean(img)
     lin_SNR = 10.0 ** (dB/10.0)
     # dB 10 * np.log10(img_var/noise_var)
     noise_var = img_var / lin_SNR #62.5 is needed
@@ -65,12 +66,17 @@ def add_noise(img, dB):
     print(noise_var)
     row,col = img.shape
     mean = 0.0
-    var = noise_var
-    sigma = var**0.5
+    variance = noise_var
+    sigma = variance**0.5
     print(sigma_noise)
-    gauss = sigma * np.random.normal(mean,sigma,(row,col)).astype('uint8')
+    gauss = variance * np.random.normal(img_mean,1,(row,col))#.astype('uint8')
+    # gauss =  sigma * np.random.randn(row,col)#.astype('uint8')
+    # gauss = sigma_noise*np.random.normal(mean,1, img.shape).astype('uint8')
     # gauss = gauss.reshape(row,col)
+    
     noisy = img + gauss
+    
+    # noisy = random_noise(img) 
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(noisy)))
     noisy = 255 * noisy / np.max(noisy)
@@ -91,10 +97,14 @@ img_blur = blur_image(img, kernel)
 
 restored_inverse = inverse_filter(img, img_blur, kernel)
 
+img_blur_noisy = add_noise(img_blur,20)
+
+restored_inverse_noisy = inverse_filter(img_blur, img_blur_noisy, kernel)
+
 plt.imshow(img_blur,cmap='gray'), plt.xticks([]), plt.yticks([])
 # plot
-display = [img_blur, restored_inverse]
-label = ['Blur function','inverse filter']
+display = [img_blur, restored_inverse,restored_inverse_noisy]
+label = ['Blur function','inverse filter','restored inverse noisy']
 
 fig = plt.figure(figsize=(12, 10))
 
