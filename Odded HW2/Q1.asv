@@ -17,7 +17,7 @@ filter_F( find(filter_F==0) ) = eps; % create a constrained inverse filter
 invFilter_F = 1./filter_F;
 res_F = bluredI_backto_F.*invFilter_F; %restored image in the frequency domain
 res = (ifft2(res_F));   % restored blurred image in the image domain
-figure() ;  imshow(uint8(res),[]); title('Restored Blurred image with an inverse filter')
+figure() ;  imshow(uint8(res,[]); title('Restored Blurred image with an inverse filter')
 
 %%  Q1 - 3
 % calculate the added noise
@@ -31,7 +31,7 @@ figure(); imshow(bluredI_noise, []); title('Blurred image with added noise')
 bluredI_noise_F = fft2(bluredI_noise);  % fourier transform the blurred and noisy image
 bluredI_noise_F_restored = bluredI_noise_F.*invFilter_F;  % apply the inverse filter on thef blurred and noisy image in frequency domain
 bluredI_noise_res = ifft2(bluredI_noise_F_restored); %restored the blurred and noisy image in the image domain
-figure(); imshow(uint8(bluredI_noise), []); title('Restored Blurred and noisy image with an inverse filter')
+figure(); imshow(bluredI_noise, []); title('Restored Blurred and noisy image with an inverse filter')
 
 %%  Q1 - 4.a
 
