@@ -55,6 +55,29 @@ def inverse_filter(img,im_blur,kernel):
     restored = 255 * restored / np.max(restored)
     return restored #.astype('uint8')
 
+def add_noise(img, dB):
+    img = img#.astype('uint8')
+    img_var = ndimage.variance(img)
+    lin_SNR = 10.0 ** (dB/10.0)
+    # dB 10 * np.log10(img_var/noise_var)
+    noise_var = img_var / lin_SNR #62.5 is needed
+    sigma_noise = (img_var / 10** ( dB / 10) ) **0.5
+    print(noise_var)
+    row,col = img.shape
+    mean = 0.0
+    var = noise_var
+    sigma = var**0.5
+    print(sigma_noise)
+    gauss = sigma * np.random.normal(mean,sigma,(row,col)).astype('uint8')
+    # gauss = gauss.reshape(row,col)
+    noisy = img + gauss
+    print('SNR ratio is:')
+    print(10 * np.log10(ndimage.variance(img)/ndimage.variance(noisy)))
+    noisy = 255 * noisy / np.max(noisy)
+    print('SNR ratio is:')
+    print(10 * np.log10(ndimage.variance(img)/ndimage.variance(noisy)))
+    return noisy.astype('uint8') 
+
 size = 10
 kernel = np.zeros((size, size))
 kernel[:, int((size-1)/2)] = np.ones(size)
