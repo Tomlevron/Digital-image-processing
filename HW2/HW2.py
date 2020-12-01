@@ -100,17 +100,17 @@ def create_kernal(size,mode='vert',d=None,im=img):
     else:
         if mode == 'vert': #vertical
             kernel = np.zeros((size, size))
-            kernel[int((size-1)/2), :] = np.ones(size)
+            kernel[:, int((size-1)/2)] = np.ones(size)
             kernel = kernel / size
-            kernel = np.pad(kernel, (((im.shape[0]-size)//2,(im.shape[0]-size)//2+1),
-                                     ((im.shape[1]-size)//2,(im.shape[1]-size)//2+1)),
+            kernel = np.pad(kernel, (((im.shape[0]-size)//2,(im.shape[0]-size)//2),
+                                     ((im.shape[1]-size)//2,(im.shape[1]-size)//2)),
                             padwithzeros)
         elif mode == 'horz': #horizontal
             kernel = np.zeros((size, size))
-            kernel[:, int((size-1)/2)] = np.ones(size)
+            kernel[int((size-1)/2), :] = np.ones(size)
             kernel = kernel / size
-            kernel = np.pad(kernel, (((im.shape[0]-size)//2,(im.shape[0]-size)//2+1),
-                                     ((im.shape[1]-size)//2,(im.shape[1]-size)//2+1)),
+            kernel = np.pad(kernel, (((im.shape[0]-size)//2,(im.shape[0]-size)//2),
+                                     ((im.shape[1]-size)//2,(im.shape[1]-size)//2)),
                             padwithzeros)
     kernel /= size 
     return kernel
