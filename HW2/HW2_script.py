@@ -9,7 +9,7 @@ import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
 from scipy.signal import convolve2d as conv2
-from numpy.fft import fft2, ifft2, ifftshift
+from numpy.fft import fft2, ifft2, ifftshift,fftshift
 from skimage import restoration
 from scipy import ndimage
 from numpy import sum,sqrt
@@ -106,6 +106,24 @@ def wiener_filter(img, kernel, noise):
     
     return filterd
 
+def wiener_filter_approx(img, kernel, noise,k1):
+    '''Perform approx winer filter on a given 
+    image (img) with kernel (kernel) 
+    and blurry image (noise) '''
+    kernel /= np.sum(kernel)
+    img_copy = np.copy(img)
+    S_uu = fft2(img_copy, s = img.shape) # image spectrum
+    S_nn = fft2(noise, s = img.shape) #noise spectrum
+    gamma = k1 #S_nn / S_uu
+    
+    img_fft = fft2(img_copy)
+    kernel_fft = fft2(kernel, s = img.shape)
+    G = np.conj(kernel_fft) / (np.abs(kernel_fft) ** 2 + gamma)
+    filterd_fft = img_fft * G
+    filterd = np.abs(ifft2(filterd_fft))
+    
+    return filterd
+
 size = 10
 kernel = np.zeros((size, size))
 kernel[:, int((size-1)/2)] = np.ones(size)
@@ -121,9 +139,11 @@ restored_inverse = inverse_filter(img, img_blur, kernel)
 
 img_blur_noisy = add_noise(img_blur,20)
 
-restored_inverse_noisy = inverse_filter(img, img_blur_noisy, kernel)
+restored_inverse_noisy = inverse_filter(img_blur, img_blur_noisy, kernel)
 
-wiener = wiener_filter(img, kernel_v, img_blur_noisy)
+wiener = wiener_filter(img_blur, kernel_v, img_blur_noisy)
+
+
 
 plt.imshow(img_blur,cmap='gray'), plt.xticks([]), plt.yticks([])
 # plot
@@ -141,6 +161,16 @@ for i in range(len(display)):
 plt.show()
 
 
+fig = plt.figure(figsize=(12, 10))
+k = [0.001, 0.0001, 0.00001, 0.000001]
+label = [str(i) for i in k]
+for i in range(len(k)):
+    wiener_approx = wiener_filter_approx(img_blur, kernel_v, img_blur_noisy,k[i])
+    fig.add_subplot(2, 2, i+1)
+    plt.imshow(wiener_approx, cmap = 'gray')
+    plt.xticks([]), plt.yticks([])
+    plt.title(label[i])
 
+plt.show()
 
 
