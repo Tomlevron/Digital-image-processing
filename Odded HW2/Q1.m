@@ -1,8 +1,7 @@
-close all
-clear all
+close all; clear all;
 % load image and plot image
-img = double(imread('cameraman.tif'));
-figure() ; imshow(img,[]);  title('Original image in gray scale')
+img = double(imread('Gonz.jpg'));
+figure() ; imshow(uint8(img),[]);  title('Original image in gray scale')
 
 %% Q1 - 1
 filter = ones(1,10)./10; % calculate the filter

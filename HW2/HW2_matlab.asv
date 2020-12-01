@@ -1,11 +1,11 @@
 %% Lab HW2 Tom Lev-ron
 clc;clear;
-img = rgb2gray( (imread('Gonz.jpg')) );
+img = (double (imread('Gonz.jpg')) );
 kernel = ones(10,1) ./10;
 
 img_blur = conv2(img,kernel,'same');
 figure;
-imshow(img_blur,[])
+imshow(uint8(img_blur),[])
 
 % Inverse filter
 
@@ -17,4 +17,4 @@ imshow(ifft2(freq_img .* freq_kernel),[])
 inverse_filter = freq_img ./ freq_kernel;
 inverse_time = real(ifft2(inverse_filter));
 figure;
-imagesc(inverse_time)
+imshow(uint8(inverse_time))
