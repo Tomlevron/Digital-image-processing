@@ -143,8 +143,6 @@ restored_inverse_noisy = inverse_filter(img_blur, img_blur_noisy, kernel)
 
 wiener = wiener_filter(img_blur, kernel_v, img_blur_noisy)
 
-
-
 plt.imshow(img_blur,cmap='gray'), plt.xticks([]), plt.yticks([])
 # plot
 display = [img_blur, restored_inverse,restored_inverse_noisy,wiener]
@@ -159,7 +157,6 @@ for i in range(len(display)):
     plt.title(label[i])
 
 plt.show()
-
 
 fig = plt.figure(figsize=(12, 10))
 k = [0.001, 0.0001, 0.00001, 0.000001]
