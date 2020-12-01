@@ -73,14 +73,14 @@ def add_noise(img, dB):
     variance = noise_var
     sigma = variance**0.5
     print(sigma_noise)
-    gauss = variance * np.random.normal(img_mean,1,(row,col))#.astype('uint8')
+    gauss = sigma * np.random.normal(img_mean,1,(row,col))#.astype('uint8')
     # gauss =  sigma * np.random.randn(row,col)#.astype('uint8')
     # gauss = sigma_noise*np.random.normal(mean,1, img.shape).astype('uint8')
     # gauss = gauss.reshape(row,col)
     
     noisy = img + gauss
     
-    # noisy = random_noise(img) 
+    # noisy = random_noise(img, mode='gaussian', seed=None, clip=True) 
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(noisy)))
     noisy = 255 * noisy / np.max(noisy)
