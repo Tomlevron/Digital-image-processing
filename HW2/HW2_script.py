@@ -37,8 +37,7 @@ def blur_image(img, kernel):
     
     im_blur = 255 * im_blur / np.max(im_blur)
     
-    return im_blur
-
+    return im_blur#.astype('uint8')
 
 def padwithzeros(vector, pad_width, iaxis, kwargs):
     vector[:pad_width[0]] = 0
@@ -59,34 +58,6 @@ def inverse_filter(img,im_blur,kernel):
     restored = 255 * restored / np.max(restored)
     return restored.astype('uint8')
 
-# def add_noise(img, dB):
-#     # img = img.astype('uint8')
-#     img_var = ndimage.variance(img)
-#     img_mean = ndimage.mean(img)
-#     lin_SNR = 10.0 ** (dB/10.0)
-#     # dB 10 * np.log10(img_var/noise_var)
-#     noise_var = img_var / lin_SNR #62.5 is needed
-#     sigma_noise = (img_var / 10** ( dB / 10) ) **0.5
-#     print(noise_var)
-#     row,col = img.shape
-#     mean = 0.0
-#     variance = noise_var
-#     sigma = variance**0.5
-#     print(sigma_noise)
-#     gauss = sigma * np.random.normal(img_mean,1,(row,col))#.astype('uint8')
-#     # gauss =  sigma * np.random.randn(row,col)#.astype('uint8')
-#     # gauss = sigma_noise*np.random.normal(mean,1, img.shape).astype('uint8')
-#     # gauss = gauss.reshape(row,col)
-    
-#     noisy = img + gauss
-    
-#     # noisy = random_noise(img, mode='gaussian', seed=None, clip=True) 
-#     print('SNR ratio is:')
-#     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(noisy)))
-#     noisy = 255 * noisy / np.max(noisy)
-#     print('SNR ratio is:')
-#     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(noisy)))
-#     return noisy#.astype('uint8') 
 
 def add_noise(img, dB):
     # img = img.astype('uint8')
@@ -100,7 +71,8 @@ def add_noise(img, dB):
     mean = 0.0
     sigma = noise_var ** 0.5
     print(sigma_noise)
-    gauss = sigma * np.random.normal(img_mean,1,(row,col))  
+    gauss = sigma * np.random.normal(img_mean,1,(row,col))
+    # gauss = 1 * np.random.normal(img_mean,1,(row,col))  
     noisy = img + gauss
     noise_vari = img_var = ndimage.variance(img) / ndimage.variance(noisy)
     print('Noise vari is:')
@@ -108,17 +80,19 @@ def add_noise(img, dB):
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
     noisy = 255 * noisy / np.max(noisy)
+    img = 255 * img / np.max(img)
+    gauss = 255 * gauss / np.max(gauss)
     print('SNR ratio after normalization is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
     
-    return noisy.astype('uint8')
+    return noisy#.astype('uint8')
 
 def wiener_filter(img, kernel, noise):
     '''Perform winer filter on a given 
     image (img) with kernel (kernel) 
     and blurry image (noise) '''
     kernel /= np.sum(kernel)
-    img_copy = np.copy(img)
+    img_copy = np.copy(img).astype('uint8')
     S_uu = fft2(img_copy, s = img.shape) # image spectrum
     S_nn = fft2(noise, s = img.shape) #noise spectrum
     gamma = S_nn / S_uu
