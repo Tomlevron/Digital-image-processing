@@ -16,8 +16,7 @@ from numpy import sum,sqrt
 from numpy.random import standard_normal
 from skimage.util import random_noise 
 
-# img = cv.imread('cameraman.tif', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
-img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
+
 
 def blur_image(img, kernel):
     '''
@@ -91,14 +90,14 @@ def wiener_filter(img, kernel, noise):
     '''Perform winer filter on a given 
     image (img) with kernel (kernel) 
     and blurry image (noise) '''
-    kernel /= np.sum(kernel)
+    kernel /= np.sum(kernel) # h
     img_copy = np.copy(img).astype('uint8')
     S_uu = fft2(img_copy, s = img.shape) # image spectrum
     S_nn = fft2(noise, s = img.shape) #noise spectrum
     gamma = S_nn / S_uu
     
     img_fft = fft2(img_copy)
-    kernel_fft = fft2(kernel, s = img.shape)
+    kernel_fft = fft2(kernel, s = img.shape) # H
     G = np.conj(kernel_fft) / (np.abs(kernel_fft) ** 2 + gamma)
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
@@ -121,6 +120,9 @@ def wiener_filter_approx(img, kernel,k1):
     # filterd = 255 * filterd / np.max(filterd)
     return filterd.astype('uint8')
 
+# img = cv.imread('cameraman.tif', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
+img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
+
 size = 10
 kernel = np.zeros((size, size))
 kernel[:, int((size-1)/2)] = np.ones(size)
@@ -138,7 +140,7 @@ img_blur_noisy = add_noise(img_blur,20)
 
 restored_inverse_noisy = inverse_filter(img_blur, img_blur_noisy, kernel)
 
-wiener = wiener_filter(img_blur, kernel_v, img_blur_noisy)
+wiener = wiener_filter(img_blur_noisy, kernel_v, img_blur_noisy)
 
 plt.imshow(img_blur,cmap='gray'), plt.xticks([]), plt.yticks([])
 # plot
