@@ -120,17 +120,37 @@ def wiener_filter_approx(img, kernel,k1):
     # filterd = 255 * filterd / np.max(filterd)
     return filterd.astype('uint8')
 
+def create_kernel(img, size):
+    ''' Create two kernels for vertical motion blurring.
+    kernel is padded with zeros, kernel_v is not.
+    Parameters
+    ----------
+    img : input image
+        input image for sizing of the kernel.
+    size : size of the required kernel.
+
+    Returns
+    -------
+    kernel : array of float 64 
+        padded with zeros.
+    kernel_v : array of float 64
+        Not padded!
+
+    '''
+    # size = 10
+    kernel = np.zeros((size, size))
+    kernel[:, int((size-1)/2)] = np.ones(size)
+    kernel = kernel / size 
+    kernel_v = np.copy(kernel)
+    kernel = np.pad(kernel, (((img.shape[0]-size)//2,(img.shape[0]-size)//2),
+                             ((img.shape[1]-size)//2,(img.shape[1]-size)//2)),
+                    padwithzeros)
+    return kernel, kernel_v
+
 # img = cv.imread('cameraman.tif', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
-size = 10
-kernel = np.zeros((size, size))
-kernel[:, int((size-1)/2)] = np.ones(size)
-kernel = kernel / size 
-kernel_v = np.copy(kernel)
-kernel = np.pad(kernel, (((img.shape[0]-size)//2,(img.shape[0]-size)//2),
-                         ((img.shape[1]-size)//2,(img.shape[1]-size)//2)),
-                padwithzeros)
+kernel, kernel_v = create_kernel(img,10)
 
 img_blur = blur_image(img, kernel)
 
