@@ -71,7 +71,7 @@ def add_noise(img, dB):
     mean = 0.0
     sigma = noise_var ** 0.5
     print(sigma_noise)
-    gauss = sigma * np.random.normal(img_mean,1,(row,col))
+    gauss = sigma * np.random.normal(0,1,(row,col))
     # gauss = 1 * np.random.normal(img_mean,1,(row,col))  
     noisy = img + gauss
     noise_vari = img_var = ndimage.variance(img) / ndimage.variance(noisy)
