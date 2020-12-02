@@ -43,19 +43,20 @@ def padwithzeros(vector, pad_width, iaxis, kwargs):
     vector[-pad_width[1]:] = 0
     return vector
 
-def inverse_filter(img,im_blur,kernel):
+def inverse_filter(im_blur,kernel):
     ''' Let f be the original image, h the blurring kernel, and g the blurred image. 
     The idea in inverse filtering is to recover the original image from the blurred image.
     '''
-    epsilon = 10**-6
+    epsilon = 10**-1
     freq_blur = fft2(im_blur)        
     freq_kernel = fft2( ifftshift(kernel) )
     freq_kernel = 1 / (epsilon + freq_kernel) # small numbers
- 
+
     convolved = freq_blur * freq_kernel
-    restored = abs(ifft2(convolved))#.real
-    restored = 255 * restored / np.max(restored)
-    return restored.astype('uint8')
+    restored = (ifft2(convolved)).real
+    # restored = abs(ifft2(convolved))
+    # restored = 255 * restored / np.max(restored)
+    return restored#.astype('uint8')
 
 
 def add_noise(img, dB):
@@ -78,7 +79,7 @@ def add_noise(img, dB):
     print(noise_vari)
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
-    noisy = 255 * noisy / np.max(noisy)
+    # noisy = 255 * noisy / np.max(noisy)
     img = 255 * img / np.max(img)
     gauss = 255 * gauss / np.max(gauss)
     print('SNR ratio after normalization is:')
@@ -91,7 +92,7 @@ def wiener_filter(img, kernel, noise):
     image (img) with kernel (kernel) 
     and blurry image (noise) '''
     kernel /= np.sum(kernel) # h
-    img_copy = np.copy(img).astype('uint8')
+    img_copy = np.copy(img)#.astype('uint8')
     S_uu = fft2(img_copy, s = img.shape) # image spectrum
     S_nn = fft2(noise, s = img.shape) #noise spectrum
     gamma = S_nn / S_uu
@@ -102,7 +103,7 @@ def wiener_filter(img, kernel, noise):
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
     
-    return filterd.astype('uint8')
+    return filterd#.astype('uint8')
 
 def wiener_filter_approx(img, kernel,k1):
     '''Perform approx winer filter on a given 
@@ -118,7 +119,7 @@ def wiener_filter_approx(img, kernel,k1):
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
     # filterd = 255 * filterd / np.max(filterd)
-    return filterd.astype('uint8')
+    return filterd#.astype('uint8')
 
 def create_kernel(img, size):
     ''' Create two kernels for vertical motion blurring.
@@ -154,11 +155,11 @@ kernel, kernel_v = create_kernel(img,10)
 
 img_blur = blur_image(img, kernel)
 
-restored_inverse = inverse_filter(img, img_blur, kernel)
+restored_inverse = inverse_filter(img_blur, kernel)
 
 img_blur_noisy = add_noise(img_blur,20)
 
-restored_inverse_noisy = inverse_filter(img_blur, img_blur_noisy, kernel)
+restored_inverse_noisy = inverse_filter(img_blur_noisy, kernel)
 
 wiener = wiener_filter(img_blur_noisy, kernel_v, img_blur_noisy)
 
