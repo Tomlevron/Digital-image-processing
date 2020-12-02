@@ -72,7 +72,7 @@ def add_noise(img, dB):
     sigma = noise_var ** 0.5
     print(sigma_noise)
     gauss = sigma * np.random.normal(0,1,(row,col))
-    # gauss = 1 * np.random.normal(img_mean,1,(row,col))  
+    # gauss = 100 * np.random.normal(0,1,(row,col))  
     noisy = img + gauss
     noise_vari = img_var = ndimage.variance(img) / ndimage.variance(noisy)
     print('Noise vari is:')
@@ -103,16 +103,14 @@ def wiener_filter(img, kernel, noise):
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
     
-    return filterd
+    return filterd.astype('uint8')
 
-def wiener_filter_approx(img, kernel, noise,k1):
+def wiener_filter_approx(img, kernel,k1):
     '''Perform approx winer filter on a given 
     image (img) with kernel (kernel) 
     and blurry image (noise) '''
     kernel /= np.sum(kernel)
     img_copy = np.copy(img)
-    S_uu = fft2(img_copy, s = img.shape) # image spectrum
-    S_nn = fft2(noise, s = img.shape) #noise spectrum
     gamma = k1 #S_nn / S_uu
     
     img_fft = fft2(img_copy)
@@ -120,8 +118,8 @@ def wiener_filter_approx(img, kernel, noise,k1):
     G = np.conj(kernel_fft) / (np.abs(kernel_fft) ** 2 + gamma)
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
-    
-    return filterd
+    # filterd = 255 * filterd / np.max(filterd)
+    return filterd.astype('uint8')
 
 size = 10
 kernel = np.zeros((size, size))
@@ -158,10 +156,10 @@ for i in range(len(display)):
 plt.show()
 
 fig = plt.figure(figsize=(12, 10))
-k = [0.001, 0.0001, 0.00001, 0.000001]
+k = [0.1, 0.01, 0.001, 0.0001]
 label = [str(i) for i in k]
 for i in range(len(k)):
-    wiener_approx = wiener_filter_approx(img_blur, kernel_v, img_blur_noisy,k[i])
+    wiener_approx = wiener_filter_approx(img_blur_noisy, kernel_v, k[i])
     fig.add_subplot(2, 2, i+1)
     plt.imshow(wiener_approx, cmap = 'gray')
     plt.xticks([]), plt.yticks([])
