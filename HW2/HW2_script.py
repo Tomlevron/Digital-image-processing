@@ -53,7 +53,7 @@ def inverse_filter(img,im_blur,kernel):
     freq_kernel = 1 / (epsilon + freq_kernel) # small numbers
  
     convolved = freq_blur * freq_kernel
-    restored = ifft2(convolved).real
+    restored = abs(ifft2(convolved))#.real
     restored = 255 * restored / np.max(restored)
     return restored.astype('uint8')
 

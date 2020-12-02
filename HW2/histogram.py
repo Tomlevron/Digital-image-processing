@@ -17,11 +17,12 @@ from matplotlib import pyplot as plt
 # from skimage.util import random_noise 
 from skimage import exposure
 
-img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
+img = cv.imread('washed_out_pollen_image.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
 # hist = cv2.calcHist([img],[0],None,[256],[0,256])
 
 plt.hist(img.ravel(),50,[0,256])
+plt.title('Orignal image histogram')
 plt.show()
 
 # Contrast stretching
@@ -34,17 +35,19 @@ fig = plt.figure(figsize=(12, 10))
 fig.add_subplot(1, 2, 1)
 plt.imshow(img, cmap = 'gray')
 plt.xticks([]), plt.yticks([])
-plt.title('Image')
+plt.title('Orignal Image')
 fig.add_subplot(1, 2, 2)
 plt.imshow(img_rescale, cmap = 'gray')
 plt.xticks([]), plt.yticks([])
-plt.title('After contrast')
+plt.title('Image After contrast stretching')
 
 plt.show()
 
 plt.hist(img_rescale.ravel(),50,[0,256])
+plt.title('histogram after contrast stretching ')
 plt.show()
 
 equ = cv.equalizeHist(img)
 plt.imshow(np.hstack((img,img_rescale,equ)), cmap='gray')
+plt.title('Orignal image, contrast stretching and the image after equalization')
 plt.xticks([]), plt.yticks([])
