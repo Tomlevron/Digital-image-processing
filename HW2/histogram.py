@@ -8,13 +8,6 @@ Created on Wed Dec  2 12:30:29 2020
 import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
-# from scipy.signal import convolve2d as conv2
-# from numpy.fft import fft2, ifft2, ifftshift,fftshift
-# from skimage import restoration
-# from scipy import ndimage
-# from numpy import sum,sqrt
-# from numpy.random import standard_normal
-# from skimage.util import random_noise 
 from skimage import exposure
 
 img = cv.imread('washed_out_pollen_image.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
