@@ -12,8 +12,6 @@ from matplotlib import pyplot as plt
 from numpy.fft import fft2, ifft2, ifftshift#,fftshift
 from scipy import ndimage
 
-
-
 def blur_image(img, kernel):
     '''
     Parameters
@@ -62,8 +60,9 @@ def inverse_filter(im_blur,kernel):
     restored = (ifft2(convolved)).real
     # restored = abs(ifft2(convolved))
     # restored = 255 * restored / np.max(restored)
+    MSE = sum(sum( (im_blur - restored)**2 ) )
+    print(MSE)
     return restored
-
 
 def add_noise(img, dB):
     '''
@@ -93,14 +92,14 @@ def add_noise(img, dB):
     print(sigma_noise)
     gauss = sigma * np.random.normal(0,1,(row,col)) 
     noisy = img + gauss
-    noise_vari = img_var = ndimage.variance(img) / ndimage.variance(noisy)
+    noise_vari = 1/(ndimage.variance(img) / ndimage.variance(gauss))
     print('Noise vari is:')
     print(noise_vari)
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
     # noisy = 255 * noisy / np.max(noisy)
     
-    return noisy#.astype('uint8')
+    return noisy #.astype('uint8')
 
 def wiener_filter(img, kernel, noise):
     '''
@@ -220,7 +219,7 @@ for i in range(len(display)):
 plt.show()
 
 fig = plt.figure(figsize=(12, 10))
-k = [0.1, 0.01, 0.001, 0.0001]
+k = [0.1, 0.05, 0.01, 0.001]
 label = [str(i) for i in k]
 for i in range(len(k)):
     wiener_approx = wiener_filter_approx(img_blur_noisy, kernel_v, k[i])
