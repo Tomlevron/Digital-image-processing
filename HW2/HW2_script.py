@@ -27,16 +27,14 @@ def blur_image(img, kernel):
     
     Returns
     -------
-    im_blur : array of uint8 (the blurred input image)
+    im_blur : image array  (the motion blurred input image)
     '''
     freq = fft2(img)
     freq_kernel = fft2(ifftshift(kernel))
     convolved1 = freq * freq_kernel
     im_blur = ifft2(convolved1).real
-    
     im_blur = 255 * im_blur / np.max(im_blur)
-    
-    return im_blur#.astype('uint8')
+    return im_blur
 
 def padwithzeros(vector, pad_width, iaxis, kwargs):
     vector[:pad_width[0]] = 0
@@ -44,8 +42,20 @@ def padwithzeros(vector, pad_width, iaxis, kwargs):
     return vector
 
 def inverse_filter(im_blur,kernel):
-    ''' Let f be the original image, h the blurring kernel, and g the blurred image. 
-    The idea in inverse filtering is to recover the original image from the blurred image.
+    '''
+    
+
+    Parameters
+    ----------
+    im_blur : Image matrix
+        The image that you want to filter.
+    kernel : Matrix with the same size as the image.
+        The kernel is the noise estimator.
+
+    Returns
+    -------
+    The restored image.
+
     '''
     epsilon = 10**-1
     freq_blur = fft2(im_blur)        
@@ -56,7 +66,7 @@ def inverse_filter(im_blur,kernel):
     restored = (ifft2(convolved)).real
     # restored = abs(ifft2(convolved))
     # restored = 255 * restored / np.max(restored)
-    return restored#.astype('uint8')
+    return restored
 
 
 def add_noise(img, dB):
@@ -75,14 +85,14 @@ def add_noise(img, dB):
         DESCRIPTION.
 
     '''
-    img_var = ndimage.variance(img)
-    img_mean = ndimage.mean(img)
+    img_var = ndimage.variance(img) ; 
+    # img_mean = ndimage.mean(img)
     lin_SNR = 10.0 ** (dB/10.0)
     noise_var = img_var / lin_SNR 
     sigma_noise = (img_var / 10** ( dB / 10) ) **0.5
     print(noise_var)
     row,col = img.shape
-    mean = 0.0
+    # mean = 0.0
     sigma = noise_var ** 0.5
     print(sigma_noise)
     gauss = sigma * np.random.normal(0,1,(row,col)) 
@@ -97,11 +107,22 @@ def add_noise(img, dB):
     return noisy#.astype('uint8')
 
 def wiener_filter(img, kernel, noise):
-    '''Perform winer filter on a given 
+    '''
+    Parameters
+    ----------
+    img : Noisy image as matrix.
+    kernel : noise estimate kernel  as matrix.
+    noise : noisy image.
+
+    Returns
+    -------
+    filterd : TYPE
+    Perform winer filter on a given 
     image (img) with kernel (kernel) 
-    and blurry image (noise) '''
+    and blurry image (noise) 
+    '''
     kernel /= np.sum(kernel) # h
-    img_copy = np.copy(img)#.astype('uint8')
+    img_copy = np.copy(img)
     S_uu = fft2(img_copy, s = img.shape) # image spectrum
     S_nn = fft2(noise, s = img.shape) #noise spectrum
     gamma = S_nn / S_uu
@@ -112,12 +133,28 @@ def wiener_filter(img, kernel, noise):
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
     
-    return filterd#.astype('uint8')
+    return filterd
 
 def wiener_filter_approx(img, kernel,k1):
-    '''Perform approx winer filter on a given 
+    '''
+    Parameters
+    ----------
+    img : Image array matrix
+        the noisy image.
+    kernel : matrix
+        The kernel noise estimator.
+    k1 : scalar
+        noise spectrom estimator.
+
+    Returns
+    -------
+    Restored image as matrix
+    
+    Perform approx winer filter on a given 
     image (img) with kernel (kernel) 
-    and blurry image (noise) '''
+    and blurry image (noise).
+
+    '''
     kernel /= np.sum(kernel)
     img_copy = np.copy(img)
     gamma = k1 #S_nn / S_uu
@@ -131,7 +168,8 @@ def wiener_filter_approx(img, kernel,k1):
     return filterd#.astype('uint8')
 
 def create_kernel(img, size):
-    ''' Create two kernels for vertical motion blurring.
+    ''' 
+    Create two kernels for vertical motion blurring.
     kernel is padded with zeros, kernel_v is not.
     Parameters
     ----------
@@ -147,7 +185,6 @@ def create_kernel(img, size):
         Not padded!
 
     '''
-    # size = 10
     kernel = np.zeros((size, size))
     kernel[:, int((size-1)/2)] = np.ones(size)
     kernel = kernel / size 
@@ -157,7 +194,6 @@ def create_kernel(img, size):
                     padwithzeros)
     return kernel, kernel_v
 
-# img = cv.imread('cameraman.tif', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
 kernel, kernel_v = create_kernel(img,10)
