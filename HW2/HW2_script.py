@@ -60,7 +60,21 @@ def inverse_filter(im_blur,kernel):
 
 
 def add_noise(img, dB):
-    # img = img.astype('uint8')
+    '''
+    Function for adding gaussian noise to an image with 
+    a wanted SNR in scake of dB.
+    Parameters. The SNR is calculated as: 10 * log10(image.var / noise.var)
+    ----------
+    img : image as input, matrix of course.
+    dB : scalar,
+        the wanted SNR in dB.
+
+    Returns
+    -------
+    noisy image with a gaussian noise of 20 dB SNR.
+        DESCRIPTION.
+
+    '''
     img_var = ndimage.variance(img)
     img_mean = ndimage.mean(img)
     lin_SNR = 10.0 ** (dB/10.0)
@@ -71,8 +85,7 @@ def add_noise(img, dB):
     mean = 0.0
     sigma = noise_var ** 0.5
     print(sigma_noise)
-    gauss = sigma * np.random.normal(0,1,(row,col))
-    # gauss = 100 * np.random.normal(0,1,(row,col))  
+    gauss = sigma * np.random.normal(0,1,(row,col)) 
     noisy = img + gauss
     noise_vari = img_var = ndimage.variance(img) / ndimage.variance(noisy)
     print('Noise vari is:')
@@ -80,10 +93,6 @@ def add_noise(img, dB):
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
     # noisy = 255 * noisy / np.max(noisy)
-    img = 255 * img / np.max(img)
-    gauss = 255 * gauss / np.max(gauss)
-    print('SNR ratio after normalization is:')
-    print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
     
     return noisy#.astype('uint8')
 
