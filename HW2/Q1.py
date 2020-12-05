@@ -59,7 +59,7 @@ def inverse_filter(im_blur,kernel):
     convolved = freq_blur * freq_kernel
     restored = (ifft2(convolved)).real
     # restored = abs(ifft2(convolved))
-    # restored = 255 * restored / np.max(restored)
+    restored = 255 * restored / np.max(restored)
     MSE = ( np.sum( (im_blur - restored)**2 ) ) / (img_blur.size)
     print('MSE of inverse and orignal is:', MSE)
     return restored
@@ -97,10 +97,10 @@ def add_noise(img, dB):
     print(noise_vari)
     print('SNR ratio is:')
     print(10 * np.log10(ndimage.variance(img)/ndimage.variance(gauss)))
-    # noisy = 255 * noisy / np.max(noisy)
+    noisy = 255 * noisy / np.max(noisy)
     MSE = ( np.sum( (img - noisy)**2 ) ) / (img_blur.size)
     print('MSE of orignal and noisy is:', MSE)
-    return noisy #.astype('uint8')
+    return noisy, gauss 
 
 def wiener_filter(img, kernel, noise):
     '''
@@ -130,6 +130,9 @@ def wiener_filter(img, kernel, noise):
     filterd = np.abs(ifft2(filterd_fft))
     MSE = ( np.sum( (img - filterd)**2 ) ) / (img_blur.size)
     print('MSE of orignal and wiener is:', MSE)
+    
+    filterd = 255 * filterd / np.max(filterd)
+    
     return filterd
 
 def wiener_filter_approx(img, kernel,k1):
@@ -161,7 +164,9 @@ def wiener_filter_approx(img, kernel,k1):
     G = np.conj(kernel_fft) / (np.abs(kernel_fft) ** 2 + gamma)
     filterd_fft = img_fft * G
     filterd = np.abs(ifft2(filterd_fft))
-    # filterd = 255 * filterd / np.max(filterd)
+    filterd = 255 * filterd / np.max(filterd)
+    MSE = ( np.sum( (img - filterd)**2 ) ) / (img.size)
+    print('MSE of orignal and wiener is:', MSE)
     return filterd#.astype('uint8')
 
 def create_kernel(img, size):
@@ -191,24 +196,25 @@ def create_kernel(img, size):
                     padwithzeros)
     return kernel, kernel_v
 
-img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
+img = cv.imread('Gonz.jpg', cv.IMREAD_GRAYSCALE) # Read image
 
-kernel, kernel_v = create_kernel(img,10)
+kernel, kernel_v = create_kernel(img,10) #construction of the kernel
 
-img_blur = blur_image(img, kernel)
+img_blur = blur_image(img, kernel) # image blurring
 
-restored_inverse = inverse_filter(img_blur, kernel)
+restored_inverse = inverse_filter(img_blur, kernel) #inverse filtring
 
-img_blur_noisy = add_noise(img_blur,20)
+img_blur_noisy , noise_g = add_noise(img_blur,20) # adding noise to the image
 
-restored_inverse_noisy = inverse_filter(img_blur_noisy, kernel)
+restored_inverse_noisy = inverse_filter(img_blur_noisy, kernel) #restoring the noisy and bluured image with inverse filter
 
-wiener = wiener_filter(img_blur_noisy, kernel_v, img_blur_noisy)
+wiener = wiener_filter(img_blur_noisy, kernel_v, noise_g)
 
 plt.imshow(img_blur,cmap='gray'), plt.xticks([]), plt.yticks([])
 # plot
 display = [img_blur, restored_inverse,restored_inverse_noisy,wiener]
-label = ['Blurred image','Restored with inverse filter','restored inverse with noise', 'wiener']
+label = ['Blurred image','Restored with inverse filter',
+         'restored inverse with noise', 'Restored image with Wiener filter']
 
 fig = plt.figure(figsize=(12, 10))
 

@@ -12,9 +12,7 @@ from skimage import exposure
 
 img = cv.imread('washed_out_pollen_image.jpg', cv.IMREAD_GRAYSCALE) # BGR and [Cols,Rows]
 
-# hist = cv2.calcHist([img],[0],None,[256],[0,256])
-
-plt.hist(img.ravel(),50,[0,256])
+plt.hist(img.ravel(),150,[85,140])
 plt.title('Orignal image histogram')
 plt.show()
 
@@ -36,11 +34,11 @@ plt.title('Image After contrast stretching')
 
 plt.show()
 
-plt.hist(img_rescale.ravel(),50,[0,256])
+plt.hist(img_rescale.ravel(),150,[0,256])
 plt.title('histogram after contrast stretching ')
 plt.show()
 
 equ = cv.equalizeHist(img)
 plt.imshow(np.hstack((img,img_rescale,equ)), cmap='gray')
-plt.title('Orignal image, contrast stretching and the image after equalization')
+# plt.title('Orignal image, contrast stretching and the image after equalization')
 plt.xticks([]), plt.yticks([])
