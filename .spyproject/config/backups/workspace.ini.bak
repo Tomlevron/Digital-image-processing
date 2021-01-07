@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['C:\\Users\\tomse\\.spyder-py3\\temp.py']
+recent_files = ['HW2\\Q1.py', 'HW2\\Q2.py', 'HW2\\Q3.py', 'HW2\\inverse_filter.py']
 
