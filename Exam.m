@@ -1,5 +1,5 @@
 clc;clear;close all;
-img = rgb2gray(imread('B.png'));
+img = rgb2gray(imread('A.png'));
 % imshow(img)
 
 A = [1 1 1];
