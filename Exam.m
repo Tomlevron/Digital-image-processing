@@ -42,15 +42,21 @@ img_5 = [ 4 4 8 8 8 8 8 8 8 8; 4 4 8 8 22 8 8 8 8 8; 4 4 8 8 22 8 8 8 8 8; ...
     4 4 4 20 20 20 7 7 7 7; 4 4 4 20 20 20 7 7 7 7; 4 4 4 20 20 20 7 7 7 7; ...
     5 5 5 17 5 18 7 7 7 7; 5 5 5 17 5 18 7 7 7 7; 5 5 5 17 5 18 7 7 7 7; ...
     5 5 5 5 5 5 7 7 7 7];
-imshow(uint8(img_5))
 
-BW = imbinarize(img_5, 13);
-imshow(BW)
+
+BW = imbinarize(img_5, 12);
 
 SE = strel('square', 3);
 eroded = imerode(BW, SE);
-imshow(eroded)
 
+figure;
+subplot(2,2,1)
+imshow(uint8(img_5))
+subplot(2,2,2)
+imshow(BW)
+subplot(2,2,3)
+imshow(eroded)
+subplot(2,2,4)
 imshow(BW - eroded)
 
 
